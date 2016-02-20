@@ -25,6 +25,16 @@ func (c *Certificate) systemVerify(opts *VerifyOptions) (chains [][]*Certificate
 func loadSystemRoots() (*CertPool, error) {
 	roots := NewCertPool()
 	var firstErr error
+
+	if file := os.Getenv("SSL_CERT_FILE"); file != "" {
+		data, err := ioutil.ReadFile(file)
+		if err == nil {
+			roots.AppendCertsFromPEM(data)
+			systemRoots = roots
+			return
+		}
+	}
+
 	for _, file := range certFiles {
 		data, err := ioutil.ReadFile(file)
 		if err == nil {
